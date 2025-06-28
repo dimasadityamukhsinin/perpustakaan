@@ -16,6 +16,12 @@ class PeminjamanController extends Controller
         return view('admin.peminjaman.index', compact('peminjaman'));
     }
 
+    public function laporan()
+    {
+        $peminjaman = Peminjaman::with(['users', 'buku'])->get();
+        return view('admin.peminjaman.laporan', compact('peminjaman'));
+    }
+
     public function create()
     {
         $users = Users::where('role', 'anggota')->get();
@@ -27,32 +33,51 @@ class PeminjamanController extends Controller
     {
         $validated = $request->validate([
             'id_user' => 'required|exists:users,id',
-            'id_buku' => 'required|exists:buku,id',
-            'jumlah_peminjaman' => 'required|integer|min:1',
+            'buku_id' => 'required|array',
+            'buku_id.*' => 'exists:buku,id',
+            'jumlah_peminjaman' => 'required|array',
+            'jumlah_peminjaman.*' => 'integer|min:1',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
         ]);
-    
-        // Validasi stok di server
-        $buku = Buku::find($validated['id_buku']);
-        if ($validated['jumlah_peminjaman'] > $buku->jumlah) {
-            return back()->withErrors(['jumlah_peminjaman' => 'Jumlah melebihi stok buku'])->withInput();
+
+        foreach ($validated['buku_id'] as $index => $buku_id) {
+            $jumlah = $validated['jumlah_peminjaman'][$index];
+
+            $buku = Buku::find($buku_id);
+
+            if ($buku && $buku->jumlah >= $jumlah) {
+                Peminjaman::create([
+                    'id_user' => $validated['id_user'],
+                    'id_buku' => $buku_id,
+                    'jumlah_peminjaman' => $jumlah,
+                    'tanggal_pinjam' => $validated['tanggal_pinjam'],
+                    'tanggal_kembali' => $validated['tanggal_kembali'],
+                    'konfirmasi' => 0,
+                ]);
+
+                $buku->decrement('jumlah', $jumlah);
+            } else {
+                return back()
+                    ->withErrors(['Buku tidak mencukupi stok'])
+                    ->withInput();
+            }
         }
 
-        // Kurangi jumlah buku
-        $buku->jumlah -= $validated['jumlah_peminjaman'];
-        $buku->save();
-    
-        Peminjaman::create($validated);
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Data peminjaman berhasil ditambahkan');
-    }    
+        return redirect()
+            ->route('admin.peminjaman.index')
+            ->with('success', 'Peminjaman berhasil disimpan');
+    }
 
     public function edit($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
         $users = Users::where('role', 'anggota')->get();
         $buku = Buku::where('jumlah', '>', 0)->get(); // hanya buku dengan stok > 0
-        return view('admin.peminjaman.edit', compact('peminjaman', 'users', 'buku'));
+        return view(
+            'admin.peminjaman.edit',
+            compact('peminjaman', 'users', 'buku')
+        );
     }
 
     public function update(Request $request, $id)
@@ -69,7 +94,7 @@ class PeminjamanController extends Controller
 
         $bukuLama = Buku::find($peminjaman->id_buku);
         $bukuBaru = Buku::find($validated['id_buku']);
-    
+
         if ($validated['id_buku'] != $peminjaman->id_buku) {
             // Kalau bukunya ganti
             if ($bukuLama) {
@@ -80,7 +105,9 @@ class PeminjamanController extends Controller
             }
         } else {
             // Bukunya sama, cek jumlahnya
-            $selisih = $validated['jumlah_peminjaman'] - $peminjaman->jumlah_peminjaman;
+            $selisih =
+                $validated['jumlah_peminjaman'] -
+                $peminjaman->jumlah_peminjaman;
             if ($selisih > 0) {
                 // Tambah peminjaman, kurangi stok
                 $bukuBaru->decrement('jumlah', $selisih);
@@ -92,7 +119,9 @@ class PeminjamanController extends Controller
         }
 
         $peminjaman->update($validated);
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Data peminjaman berhasil diupdate');
+        return redirect()
+            ->route('admin.peminjaman.index')
+            ->with('success', 'Data peminjaman berhasil diupdate');
     }
 
     public function konfirmasi($id)
@@ -120,7 +149,7 @@ class PeminjamanController extends Controller
         if ($buku && $jumlahPinjam > 0) {
             $buku->increment('jumlah', $jumlahPinjam);
         }
-    
+
         $peminjaman->delete();
 
         return redirect()

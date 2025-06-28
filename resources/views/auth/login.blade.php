@@ -22,6 +22,8 @@
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
+    <img src="{{ asset('assets/logo.png') }}" alt="Logo" style="max-height:120px; margin-bottom:10px;">
+    <br>
     <b>Perpustakaan</b>
   </div>
   <!-- /.login-logo -->

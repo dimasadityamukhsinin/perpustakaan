@@ -8,6 +8,9 @@
     <div class="col-md-2">
         <a href="{{ route('admin.kategori_buku.create') }}" class="btn btn-success">Tambah Kategori</a>
     </div>
+    <div class="col-md-10 text-right">
+        <a href="{{ route('admin.kategori_buku.laporan') }}" class="btn btn-info">Laporan Kategori Buku</a>
+    </div>
 </div>
 @if(session('success'))
     <div class="alert alert-success" style="margin-top: 15px;">{{ session('success') }}</div>

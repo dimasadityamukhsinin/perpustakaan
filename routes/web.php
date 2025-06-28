@@ -23,16 +23,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('anggota', AdminAnggotaController::class)->parameters([
         'anggota' => 'users'
-    ]);
+    ])->except(['show']);
     Route::get('anggota/{anggota}/password', [AdminAnggotaController::class, 'editPassword'])->name('anggota.editPassword');
     Route::put('anggota/{anggota}/password', [AdminAnggotaController::class, 'updatePassword'])->name('anggota.updatePassword');
-    Route::resource('buku', AdminBukuController::class);
-    Route::resource('kategori_buku', AdminKategoriBukuController::class);
-    Route::resource('rak_buku', AdminRakBukuController::class);
-    Route::resource('peminjaman', AdminPeminjamanController::class);
+    Route::get('anggota/laporan', [AdminAnggotaController::class, 'laporan'])->name('anggota.laporan');
+    Route::resource('buku', AdminBukuController::class)->except(['show']);
+    Route::get('buku/laporan', [AdminBukuController::class, 'laporan'])->name('buku.laporan');
+    Route::resource('kategori_buku', AdminKategoriBukuController::class)->except(['show']);
+    Route::get('kategori_buku/laporan', [AdminKategoriBukuController::class, 'laporan'])->name('kategori_buku.laporan');
+    Route::resource('rak_buku', AdminRakBukuController::class)->except(['show']);
+    Route::get('rak_buku/laporan', [AdminRakBukuController::class, 'laporan'])->name('rak_buku.laporan');
+    Route::resource('peminjaman', AdminPeminjamanController::class)->except(['show']);
     Route::get('peminjaman/{id}/konfirmasi', [AdminPeminjamanController::class, 'konfirmasi'])->name('peminjaman.konfirmasi');
-    Route::resource('pengembalian', AdminPengembalianController::class);
+    Route::get('peminjaman/laporan', [AdminPeminjamanController::class, 'laporan'])->name('peminjaman.laporan');
+    Route::resource('pengembalian', AdminPengembalianController::class)->except(['show']);
     Route::get('pengembalian/kembalikan/{id}', [AdminPengembalianController::class, 'kembalikanForm'])->name('pengembalian.kembalikan');
+    Route::get('pengembalian/laporan', [AdminPengembalianController::class, 'laporan'])->name('pengembalian.laporan');
 });
 
 

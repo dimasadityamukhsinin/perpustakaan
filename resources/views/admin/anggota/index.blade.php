@@ -8,6 +8,9 @@
     <div class="col-md-2">
         <a href="{{ route('admin.anggota.create') }}" class="btn btn-success">Tambah Anggota</a>
     </div>
+    <div class="col-md-10 text-right">
+        <a href="{{ route('admin.anggota.laporan') }}" class="btn btn-info">Laporan Anggota</a>
+    </div>
 </div>
 @if(session('success'))
     <div class="alert alert-success" style="margin-top: 15px;">{{ session('success') }}</div>
@@ -17,6 +20,7 @@
         <table id="table" class="table table-bordered table-striped">
         <thead>
         <tr>
+            <th>No</th>
             <th>Username</th>
             <th>Nama</th>
             <th>Email</th>
@@ -28,6 +32,7 @@
         <tbody>
             @foreach($anggotas as $anggota)
             <tr>
+                <td>{{ $loop->iteration }}</td>
                 <td>{{ $anggota->username }}</td>
                 <td>{{ $anggota->nama }}</td>
                 <td>{{ $anggota->email }}</td>

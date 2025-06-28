@@ -8,6 +8,9 @@
     <div class="col-md-2">
         <a href="{{ route('admin.rak_buku.create') }}" class="btn btn-success">Tambah Rak</a>
     </div>
+    <div class="col-md-10 text-right">
+        <a href="{{ route('admin.rak_buku.laporan') }}" class="btn btn-info">Laporan Rak Buku</a>
+    </div>
 </div>
 @if(session('success'))
     <div class="alert alert-success" style="margin-top: 15px;">{{ session('success') }}</div>

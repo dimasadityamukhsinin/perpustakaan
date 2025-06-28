@@ -15,6 +15,12 @@ class AnggotaController extends Controller
         return view('admin.anggota.index', compact('anggotas'));
     }
 
+    public function laporan()
+    {
+        $anggotas = Users::where('role', 'anggota')->get();
+        return view('admin.anggota.laporan', compact('anggotas'));
+    }
+
     public function create()
     {
         return view('admin.anggota.create');

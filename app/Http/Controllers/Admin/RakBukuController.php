@@ -14,6 +14,12 @@ class RakBukuController extends Controller
         return view('admin.rak_buku.index', compact('rak'));
     }
 
+    public function laporan()
+    {
+        $rak = RakBuku::all();
+        return view('admin.rak_buku.laporan', compact('rak'));
+    }
+
     public function create()
     {
         return view('admin.rak_buku.create');

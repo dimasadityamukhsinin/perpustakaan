@@ -14,6 +14,12 @@ class KategoriBukuController extends Controller
         return view('admin.kategori_buku.index', compact('kategori'));
     }
 
+    public function laporan()
+    {
+        $kategori = KategoriBuku::all();
+        return view('admin.kategori_buku.laporan', compact('kategori'));
+    }
+
     public function create()
     {
         return view('admin.kategori_buku.create');
